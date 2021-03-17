@@ -1,0 +1,20 @@
+# Recipes for Docker CE engine
+#
+# based on https://docs.docker.com/install/linux/docker-ce/ubuntu/
+
+- name: Uninstall old versions
+  apt: name=docker,docker-engine,docker.io state=absent
+
+- name: Update the apt package index
+  apt:
+    autoclean:    yes
+    autoremove:   yes
+    update_cache: yes
+
+- name: Install packages to allow apt to use a repository over HTTPS
+  apt:
+    name:  apt-transport-https,ca-certificates,curl,software-properties-common
+    state: present
+
+- import_tasks: engine.yml
+- import_tasks: compose.yml

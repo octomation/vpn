@@ -1,0 +1,11 @@
+# Recipes for OpenVPN server with Docker
+#
+# based on https://github.com/kylemanna/docker-openvpn
+
+- name: Pull OpenVPN image
+  docker_image:
+    name: kylemanna/openvpn
+    tag: "{{ openvpn_version }}"
+    source: pull
+    state: present
+    force_source: yes

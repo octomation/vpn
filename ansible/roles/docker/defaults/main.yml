@@ -1,0 +1,2 @@
+docker_compose_version: 1.25.5
+docker_sdk_version:     4.2.0
