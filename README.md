@@ -20,7 +20,7 @@
 
 ## 📦 Resources
 
-### Infrastructure
+### Internals
 
 - [Ansible is Simple IT Automation](https://www.ansible.com/)
   - [Ansible at GitHub](https://github.com/ansible)
@@ -43,4 +43,14 @@
 - [OpenVPN installer for Linux servers](https://github.com/angristan/openvpn-install)
 - [WireGuard VPN installer for Linux servers](https://github.com/angristan/wireguard-install)
 
+### Infrastructure
+
+- [DigitalOcean][do] - worldwide locations, IPv6 support, starting at $5/month
+- [Linode][linode] - worldwide locations, IPv6 support, starting at $5/month
+- [Vultr][vultr] - worldwide locations, IPv6 support, starting at $2.5/month
+
 <p align="right">made with ❤️ for everyone</p>
+
+[do]:     http://bit.ly/vps-do-ref
+[linode]: http://bit.ly/vps-linode-ref
+[vultr]:  http://bit.ly/vps-vultr-ref
