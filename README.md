@@ -45,9 +45,11 @@
 
 ### Infrastructure
 
-- [DigitalOcean][do] - worldwide locations, IPv6 support, starting at $5/month
-- [Linode][linode] - worldwide locations, IPv6 support, starting at $5/month
-- [Vultr][vultr] - worldwide locations, IPv6 support, starting at $2.5/month
+| Provider           | Availability | IPv6 | Price      |
+|:-------------------|:-------------|:----:|-----------:|
+| [DigitalOcean][do] | worldwide    |  ✓   | $5/month   |
+| [Linode][linode]   | worldwide    |  ✓   | $5/month   |
+| [Vultr][vultr]     | worldwide    |  ✓   | $2.5/month |
 
 <p align="right">made with ❤️ for everyone</p>
 
