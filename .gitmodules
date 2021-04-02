@@ -1,0 +1,18 @@
+[submodule "research/kylemanna/docker-openvpn"]
+	path = research/kylemanna/docker-openvpn
+	url = git@github.com:kylemanna/docker-openvpn.git
+[submodule "research/angristan/openvpn-install"]
+	path = research/angristan/openvpn-install
+	url = git@github.com:angristan/openvpn-install.git
+[submodule "research/angristan/wireguard-install"]
+	path = research/angristan/wireguard-install
+	url = git@github.com:angristan/wireguard-install.git
+[submodule "research/Nyr/openvpn-install"]
+	path = research/Nyr/openvpn-install
+	url = git@github.com:Nyr/openvpn-install.git
+[submodule "research/Nyr/wireguard-install"]
+	path = research/Nyr/wireguard-install
+	url = git@github.com:Nyr/wireguard-install.git
+[submodule "research/timurb/ansible-digitalocean-vpn"]
+	path = research/timurb/ansible-digitalocean-vpn
+	url = git@github.com:timurb/ansible-digitalocean-vpn.git
