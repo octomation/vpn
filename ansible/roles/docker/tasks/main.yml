@@ -1,6 +1,6 @@
 # Recipes for Docker CE engine
 #
-# based on https://docs.docker.com/install/linux/docker-ce/ubuntu/
+# based on https://docs.docker.com/engine/install/ubuntu/
 
 - name: Uninstall old versions
   apt: name=docker,docker-engine,docker.io state=absent
@@ -13,7 +13,12 @@
 
 - name: Install packages to allow apt to use a repository over HTTPS
   apt:
-    name:  apt-transport-https,ca-certificates,curl,software-properties-common
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
     state: present
 
 - import_tasks: engine.yml
