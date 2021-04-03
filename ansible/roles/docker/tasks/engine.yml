@@ -14,19 +14,14 @@
 
 - name: Install the latest version of Docker CE
   apt:
-    name:         docker-ce
-    state:        latest
-    update_cache: yes
-
-- name: Install the pip
-  apt:
-    name: python3-pip
-    state: present
-
-- name: Install the Docker SDK
-  pip:
-    name: "docker>={{ docker_sdk_version }}"
-    state: present
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
 
 - name: Ensure Docker is running (and enable it at boot)
-  service: name=docker state=started enabled=yes
+  service:
+    name:    docker
+    state:   started
+    enabled: yes
