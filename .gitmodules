@@ -19,3 +19,6 @@
 [submodule "research/StreisandEffect/streisand"]
 	path = research/StreisandEffect/streisand
 	url = git@github.com:StreisandEffect/streisand.git
+[submodule "research/Jigsaw-Code/outline-server"]
+	path = research/Jigsaw-Code/outline-server
+	url = git@github.com:Jigsaw-Code/outline-server.git
