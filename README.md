@@ -13,6 +13,18 @@ Internet censorship has been increasing steadily for the last decade. Needs more
 
 ## 🤼‍♂️ How to
 
+```bash
+$ export VPN_NAME=gateway   # your server name, any way you like
+$ export VPN_HOST=127.0.0.1 # your server ip
+
+$ cat ansible/hosts.tpl.ini \
+  | sed "s/{{.Name}}/${VPN_NAME}/g" \
+  | sed "s/{{.Host}}/${VPN_HOST}/g" \
+  > ansible/hosts
+
+$ make
+```
+
 ### Recommended providers
 
 | Provider           | Availability | IPv6 | Price      |
@@ -23,22 +35,10 @@ Internet censorship has been increasing steadily for the last decade. Needs more
 
 <small>all links are referral</small>
 
-### With Ansible
-
-```bash
-$ ansible-playbook ansible/vpn.yml
-```
-
-### With Docker
-
-```bash
-$ docker run ...
-```
-
 ## 🧩 Installation
 
 ```bash
-$ git clone ...
+$ git clone git@github.com:octomation/vpn.git && cd vpn
 ```
 
 ## 👨‍🔬 Research
@@ -58,7 +58,7 @@ At DigitalOcean
 ### Sources
 
 - [Jigsaw-Code/outline-server](https://github.com/Jigsaw-Code/outline-server)
-    - [x] [install_server.sh](research/Jigsaw-Code/outline-server/src/server_manager/install_scripts/install_server.sh)
+  - [x] [install_server.sh](research/Jigsaw-Code/outline-server/src/server_manager/install_scripts/install_server.sh)
 - [ ] [angristan/openvpn-install](https://github.com/angristan/openvpn-install)
 - [ ] [angristan/wireguard-install](https://github.com/angristan/wireguard-install)
 - [ ] [kylemanna/docker-openvpn](https://github.com/kylemanna/docker-openvpn)
@@ -70,11 +70,13 @@ At DigitalOcean
 ### Toolset
 
 - [Ansible is Simple IT Automation](https://www.ansible.com/).
-    - [Ansible at GitHub](https://github.com/ansible).
+  - [Ansible at GitHub](https://github.com/ansible).
 - [Empowering App Development for Developers | Docker](https://www.docker.com/).
-    - [Docker at GitHub](https://github.com/docker).
+  - [Docker at GitHub](https://github.com/docker).
 - [Outline VPN - Access to the free and open internet](https://www.getoutline.org/).
-    - [Outline at GitHub](https://github.com/Jigsaw-Code/?q=outline).
+  - [Outline at GitHub](https://github.com/Jigsaw-Code/?q=outline).
+  - [containrrr/watchtower at Docker Hub](https://hub.docker.com/r/containrrr/watchtower).
+  - [outline/shadowbox at Quay.io](https://quay.io/repository/outline/shadowbox).
 
 <p align="right">made with ❤️ for everyone</p>
 

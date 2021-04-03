@@ -1,11 +1,38 @@
-# Recipes for OpenVPN server with Docker
-#
-# based on https://github.com/kylemanna/docker-openvpn
+- name: Upload Outline Server installation script
+  copy:
+    src:    scripts/install_outline.sh
+    dest:   /tmp/install_outline.sh
+    mode:   0744
+    backup: no
+    force:  yes
 
-- name: Pull OpenVPN image
-  docker_image:
-    name: kylemanna/openvpn
-    tag: "{{ openvpn_version }}"
-    source: pull
-    state: present
-    force_source: yes
+- name: Run installation process
+  shell:
+    executable: /usr/bin/bash
+    cmd: |
+      outline_flags=("")
+
+      if [ -n "{{ outline_hostname }}" ]; then
+        outline_flags+=(--hostname {{ outline_hostname }})
+      fi
+
+      if [ -n "{{ outline_api_port }}" ]; then
+        outline_flags+=(--api-port {{ outline_api_port }})
+      fi
+
+      if [ -n "{{ outline_keys_port }}" ]; then
+        outline_flags+=(--keys-port {{ outline_keys_port }})
+      fi
+
+      /tmp/install_outline.sh "${outline_flags[@]}"
+    creates: "{{ outline_shadowbox_dir }}"
+  environment:
+    SB_IMAGE:                   "{{ outline_shadowbox_image }}"
+    SHADOWBOX_DIR:              "{{ outline_shadowbox_dir }}"
+    ACCESS_CONFIG:              "{{ outline_access_config }}"
+    WATCHTOWER_REFRESH_SECONDS: "{{ outline_refresh }}"
+    SB_DEFAULT_SERVER_NAME:     "{{ outline_server_name }}"
+  register: outline
+
+- debug: var=outline.stdout_lines
+- debug: var=outline.stderr_lines

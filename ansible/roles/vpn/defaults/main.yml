@@ -1,1 +1,10 @@
-openvpn_version: latest
+outline_hostname:  ~ # -> FLAGS_HOSTNAME -> PUBLIC_HOSTNAME
+outline_api_port:  ~ # -> FLAGS_API_PORT
+outline_keys_port: ~ # -> FLAGS_KEYS_PORT
+
+outline_shadowbox_image:  quay.io/outline/shadowbox:stable  # SB_IMAGE
+outline_shadowbox_dir:    /opt/outline                      # SHADOWBOX_DIR
+outline_access_config:    /opt/outline/access.txt           # ACCESS_CONFIG
+outline_refresh:          3600                              # WATCHTOWER_REFRESH_SECONDS
+
+outline_server_name: Personal VPN # SB_DEFAULT_SERVER_NAME
