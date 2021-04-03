@@ -16,3 +16,6 @@
 [submodule "research/timurb/ansible-digitalocean-vpn"]
 	path = research/timurb/ansible-digitalocean-vpn
 	url = git@github.com:timurb/ansible-digitalocean-vpn.git
+[submodule "research/StreisandEffect/streisand"]
+	path = research/StreisandEffect/streisand
+	url = git@github.com:StreisandEffect/streisand.git
