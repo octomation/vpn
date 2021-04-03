@@ -1,0 +1,7 @@
+---
+
+- hosts: vpn:&docker
+  become: yes
+
+  roles:
+    - docker
