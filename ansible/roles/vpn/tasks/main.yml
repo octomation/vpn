@@ -34,5 +34,7 @@
     SB_DEFAULT_SERVER_NAME:     "{{ outline_server_name }}"
   register: outline
 
-- debug: var=outline.stdout_lines
-- debug: var=outline.stderr_lines
+# TODO:refactoring replace by "ssh user@host cat outline_access_config | json"
+- name: Print installation process stdout
+  debug:
+    var: outline.stdout_lines

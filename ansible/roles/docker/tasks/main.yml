@@ -3,7 +3,12 @@
 # based on https://docs.docker.com/engine/install/ubuntu/
 
 - name: Uninstall old versions
-  apt: name=docker,docker-engine,docker.io state=absent
+  apt:
+    name:
+      - docker
+      - docker-engine
+      - docker.io
+    state: absent
 
 - name: Update the apt package index
   apt:
