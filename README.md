@@ -80,6 +80,20 @@ At Serverwise
   - [containrrr/watchtower at Docker Hub](https://hub.docker.com/r/containrrr/watchtower).
   - [outline/shadowbox at Quay.io](https://quay.io/repository/outline/shadowbox).
 
+#### Upcoming
+
+- [VPN Software Solutions & Services For Business | OpenVPN](https://openvpn.net/).
+  - [OpenVPN at GitHub](https://github.com/OpenVPN).
+  - [Tunnelblick | Free open source OpenVPN VPN client server software for macOS](https://www.tunnelblick.net/).
+- [WireGuard: fast, modern, secure VPN tunnel](https://www.wireguard.com/).
+  - [WireGuard at GitHub](https://github.com/wireguard).
+- [Best VPN Service for Secure Networks - Tailscale](https://tailscale.com/).
+  - [Tailscale at GitHub](https://github.com/tailscale).
+- [SoftEther VPN Project](https://www.softether.org/).
+  - [SoftEther VPN at GitHub](https://github.com/SoftEtherVPN).
+- [Vagrant by HashiCorp](https://www.vagrantup.com/).
+  - [Vagrant at GitHub](https://github.com/hashicorp?q=vagrant).
+
 <p align="right">made with ❤️ for everyone</p>
 
 [do]:     http://bit.ly/vps-do-ref
