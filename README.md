@@ -33,7 +33,7 @@ $ make
 | [Linode][linode]   | worldwide    |  ✓   | $5/month   |
 | [Vultr][vultr]     | worldwide    |  ✓   | $2.5/month |
 
-<small>all links are referral</small>
+<small>☝️ all links are referral</small>
 
 ## 🧩 Installation
 
@@ -57,7 +57,7 @@ At DigitalOcean
 
 ### Sources
 
-- [Jigsaw-Code/outline-server](https://github.com/Jigsaw-Code/outline-server)
+- [ ] [Jigsaw-Code/outline-server](https://github.com/Jigsaw-Code/outline-server)
   - [x] [install_server.sh](research/Jigsaw-Code/outline-server/src/server_manager/install_scripts/install_server.sh)
 - [ ] [angristan/openvpn-install](https://github.com/angristan/openvpn-install)
 - [ ] [angristan/wireguard-install](https://github.com/angristan/wireguard-install)
@@ -75,6 +75,7 @@ At DigitalOcean
   - [Docker at GitHub](https://github.com/docker).
 - [Outline VPN - Access to the free and open internet](https://www.getoutline.org/).
   - [Outline at GitHub](https://github.com/Jigsaw-Code/?q=outline).
+- Docker images
   - [containrrr/watchtower at Docker Hub](https://hub.docker.com/r/containrrr/watchtower).
   - [outline/shadowbox at Quay.io](https://quay.io/repository/outline/shadowbox).
 
