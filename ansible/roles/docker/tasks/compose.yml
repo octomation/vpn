@@ -7,6 +7,7 @@
   pip:
     name: "docker>={{ docker_sdk_version }}"
     state: present
+    break_system_packages: true
 
 - name: Install docker-compose
   get_url:
