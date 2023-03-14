@@ -1,0 +1,10 @@
+# gost
+gost_image: "gogost/gost:3"
+
+# mtproto
+mtg_image: "nineseconds/mtg:2"
+teleproxy_image: "ghcr.io/teleproxy/teleproxy:4"
+telemt_image: "ghcr.io/telemt/telemt:latest"
+
+# socks5
+socks5_image: "serjs/go-socks5-proxy:latest"
