@@ -1,0 +1,9 @@
+services:
+  mtg:
+    image: {{ mtg_image }}
+    container_name: mtg
+    restart: always
+    ports:
+      - "127.0.0.1:{{ mtproto_port }}:3128"
+    volumes:
+      - ./config.toml:/config.toml:ro

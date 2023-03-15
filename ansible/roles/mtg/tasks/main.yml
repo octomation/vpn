@@ -1,0 +1,63 @@
+---
+
+- name: Create mtg directory
+  file:
+    path: /opt/mtg
+    state: directory
+    mode: "0755"
+
+- name: Check if secret already exists
+  stat:
+    path: /opt/mtg/secret
+  register: mtg_secret_file
+
+- name: Generate mtg secret
+  shell: docker run --rm {{ mtg_image }} generate-secret --hex {{ mtg_domain }}
+  register: mtg_secret_generated
+  when: not mtg_secret_file.stat.exists
+
+- name: Save mtg secret to file
+  copy:
+    content: "{{ mtg_secret_generated.stdout }}"
+    dest: /opt/mtg/secret
+    mode: "0600"
+  when: not mtg_secret_file.stat.exists
+
+- name: Read mtg secret
+  slurp:
+    src: /opt/mtg/secret
+  register: mtg_secret_raw
+
+- name: Set mtg_secret fact
+  set_fact:
+    mtg_secret: "{{ mtg_secret_raw.content | b64decode | trim }}"
+
+- name: Deploy mtg config
+  template:
+    src: config.toml.j2
+    dest: /opt/mtg/config.toml
+    mode: "0644"
+  notify: restart mtg
+
+- name: Deploy docker-compose for mtg
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/mtg/docker-compose.yml
+    mode: "0644"
+  notify: restart mtg
+
+- name: Pull mtg image
+  shell: docker pull {{ mtg_image }}
+  register: mtg_pull
+  changed_when: "'Downloaded newer image' in mtg_pull.stdout or 'Pull complete' in mtg_pull.stdout"
+
+- name: Start mtg
+  shell: docker compose up -d
+  args:
+    chdir: /opt/mtg
+  register: mtg_up
+  changed_when: "'Started' in mtg_up.stderr or 'Creating' in mtg_up.stderr"
+
+- name: Print mtg secret for client configuration
+  debug:
+    msg: "MTProto secret: {{ mtg_secret }}"
