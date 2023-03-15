@@ -1,27 +1,34 @@
-- name: Add Docker’s official GPG key
-  apt_key:
-    id:             0EBFCD88
-    url:            https://download.docker.com/linux/ubuntu/gpg
-    state:          present
-    validate_certs: yes
+- name: Add Docker's official GPG key
+  shell:
+    cmd: |
+      install -m 0755 -d /etc/apt/keyrings
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+      chmod a+r /etc/apt/keyrings/docker.asc
+    creates: /etc/apt/keyrings/docker.asc
 
-- name: Set up the stable repository
-  apt_repository:
-    repo:           deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
-    filename:       docker
-    state:          present
-    validate_certs: yes
+- name: Set up the Docker repository
+  shell:
+    cmd: |
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo ${VERSION_CODENAME}) stable" \
+        > /etc/apt/sources.list.d/docker.list
+    creates: /etc/apt/sources.list.d/docker.list
 
-- name: Install the latest version of Docker CE
+- name: Update apt cache after adding Docker repo
+  apt:
+    update_cache: yes
+
+- name: Install Docker CE and plugins
   apt:
     name:
       - docker-ce
       - docker-ce-cli
       - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
     state: latest
 
 - name: Ensure Docker is running (and enable it at boot)
   service:
-    name:    docker
-    state:   started
+    name: docker
+    state: started
     enabled: yes

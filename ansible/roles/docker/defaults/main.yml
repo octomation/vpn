@@ -1,2 +1,1 @@
-docker_compose_version: 1.29.0
-docker_sdk_version:     5.0.0
+docker_sdk_version: 7.1.0
