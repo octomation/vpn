@@ -1,0 +1,31 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install base packages
+  apt:
+    name:
+      - ufw
+      - curl
+      - ca-certificates
+      - gnupg
+    state: present
+
+- name: Set UFW default policy — deny incoming
+  ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+
+- name: Set UFW default policy — allow outgoing
+  ufw:
+    policy: allow
+    direction: outgoing
+
+- name: Allow SSH
+  ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
