@@ -1,0 +1,47 @@
+---
+
+- name: Create gost directory
+  file:
+    path: /opt/gost
+    state: directory
+    mode: "0755"
+
+- name: Deploy gost relay config
+  template:
+    src: gost.yml.j2
+    dest: /opt/gost/gost.yml
+    mode: "0644"
+  notify: restart gost relay
+
+- name: Deploy docker-compose for relay
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/gost/docker-compose.yml
+    mode: "0644"
+  notify: restart gost relay
+
+- name: Allow MTProto port
+  ufw:
+    rule: allow
+    port: "{{ mtproto_port }}"
+    proto: tcp
+    comment: "MTProto relay"
+
+- name: Allow SOCKS5 port
+  ufw:
+    rule: allow
+    port: "{{ socks5_port }}"
+    proto: tcp
+    comment: "SOCKS5 relay"
+
+- name: Pull gost image
+  shell: docker pull {{ gost_image }}
+  register: gost_pull
+  changed_when: "'Downloaded newer image' in gost_pull.stdout or 'Pull complete' in gost_pull.stdout"
+
+- name: Start gost relay
+  shell: docker compose up -d
+  args:
+    chdir: /opt/gost
+  register: gost_up
+  changed_when: "'Started' in gost_up.stderr or 'Creating' in gost_up.stderr"

@@ -1,0 +1,7 @@
+services:
+  - name: tls-relay-endpoint
+    addr: ":{{ gost_tls_port }}"
+    handler:
+      type: relay
+    listener:
+      type: tls

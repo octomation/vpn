@@ -1,0 +1,36 @@
+services:
+  - name: mtproto-forward
+    addr: ":{{ mtproto_port }}"
+    handler:
+      type: tcp
+      chain: tls-chain
+    listener:
+      type: tcp
+    forwarder:
+      nodes:
+        - name: gateway-mtproto
+          addr: "127.0.0.1:{{ mtproto_port }}"
+
+  - name: socks5-forward
+    addr: ":{{ socks5_port }}"
+    handler:
+      type: tcp
+      chain: tls-chain
+    listener:
+      type: tcp
+    forwarder:
+      nodes:
+        - name: gateway-socks5
+          addr: "127.0.0.1:{{ socks5_port }}"
+
+chains:
+  - name: tls-chain
+    hops:
+      - name: hop-0
+        nodes:
+          - name: gateway-relay
+            addr: "{{ gateway_server_ip }}:{{ gost_tls_port }}"
+            connector:
+              type: relay
+            dialer:
+              type: tls

@@ -1,0 +1,9 @@
+services:
+  gost:
+    image: {{ gost_image }}
+    container_name: gost-gateway
+    restart: always
+    network_mode: host
+    volumes:
+      - ./gost.yml:/etc/gost/gost.yml:ro
+    command: "-C /etc/gost/gost.yml"

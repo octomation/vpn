@@ -1,0 +1,41 @@
+---
+
+- name: Create gost directory
+  file:
+    path: /opt/gost
+    state: directory
+    mode: "0755"
+
+- name: Deploy gost gateway config
+  template:
+    src: gost.yml.j2
+    dest: /opt/gost/gost.yml
+    mode: "0644"
+  notify: restart gost gateway
+
+- name: Deploy docker-compose for gateway
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/gost/docker-compose.yml
+    mode: "0644"
+  notify: restart gost gateway
+
+- name: Allow TLS tunnel from relay only
+  ufw:
+    rule: allow
+    from_ip: "{{ relay_server_ip }}"
+    port: "{{ gost_tls_port }}"
+    proto: tcp
+    comment: "gost TLS from relay"
+
+- name: Pull gost image
+  shell: docker pull {{ gost_image }}
+  register: gost_pull
+  changed_when: "'Downloaded newer image' in gost_pull.stdout or 'Pull complete' in gost_pull.stdout"
+
+- name: Start gost gateway
+  shell: docker compose up -d
+  args:
+    chdir: /opt/gost
+  register: gost_up
+  changed_when: "'Started' in gost_up.stderr or 'Creating' in gost_up.stderr"

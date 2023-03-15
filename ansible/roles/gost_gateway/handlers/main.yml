@@ -1,0 +1,6 @@
+---
+
+- name: restart gost gateway
+  shell: docker compose up -d --force-recreate
+  args:
+    chdir: /opt/gost
