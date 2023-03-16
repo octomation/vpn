@@ -1,4 +1,4 @@
-# Proxy Solutions Research
+# Proxy solutions research
 
 ## GOST vs sing-box
 
