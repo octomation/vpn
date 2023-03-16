@@ -10,6 +10,10 @@ setup:
 	$(AT) ansible-playbook ansible/vpn.yml
 .PHONY: setup
 
+telegram:
+	$(AT) ansible-playbook ansible/telegram.yml
+.PHONY: telegram
+
 sync: SRC = research/Jigsaw-Code/outline-server/src/server_manager/install_scripts
 sync: DST = ansible/roles/vpn/scripts
 sync:

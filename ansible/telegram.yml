@@ -1,0 +1,22 @@
+---
+
+- name: Common setup for proxy servers
+  hosts: relay:gateway
+  become: true
+  roles:
+    - common
+    - docker
+
+- name: Configure gateway (deploy first)
+  hosts: gateway
+  become: true
+  roles:
+    - mtg
+    - socks5
+    - gost_gateway
+
+- name: Configure relay
+  hosts: relay
+  become: true
+  roles:
+    - gost_relay
