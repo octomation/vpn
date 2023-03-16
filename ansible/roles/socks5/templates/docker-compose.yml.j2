@@ -1,0 +1,10 @@
+services:
+  socks5:
+    image: {{ socks5_image }}
+    container_name: socks5
+    restart: always
+    ports:
+      - "127.0.0.1:{{ socks5_port }}:1080"
+    environment:
+      PROXY_USER: "{{ socks5_user }}"
+      PROXY_PASSWORD: "{{ socks5_password }}"

@@ -1,0 +1,26 @@
+---
+
+- name: Create socks5 directory
+  file:
+    path: /opt/socks5
+    state: directory
+    mode: "0755"
+
+- name: Deploy docker-compose for socks5
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/socks5/docker-compose.yml
+    mode: "0644"
+  notify: restart socks5
+
+- name: Pull socks5 image
+  shell: docker pull {{ socks5_image }}
+  register: socks5_pull
+  changed_when: "'Downloaded newer image' in socks5_pull.stdout or 'Pull complete' in socks5_pull.stdout"
+
+- name: Start socks5
+  shell: docker compose up -d
+  args:
+    chdir: /opt/socks5
+  register: socks5_up
+  changed_when: "'Started' in socks5_up.stderr or 'Creating' in socks5_up.stderr"
