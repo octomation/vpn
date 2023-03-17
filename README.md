@@ -1,4 +1,4 @@
-> # 🤫 VPN
+> # ✊ Breakout
 >
 > Easy way to up your virtual private network.
 
@@ -11,7 +11,116 @@ Nothing special, just to find a way to set up and run a personal VPN quickly.
 Internet censorship has been increasing steadily for the last decade. Needs more?
 [10 reasons why you need a VPN](https://www.techradar.com/news/10-reasons-why-you-need-a-vpn).
 
-## 🤼‍♂️ How to
+## 🏗️ Architecture
+
+### Outline VPN (single-server)
+
+A single server running [Outline VPN](https://www.getoutline.org/) (Shadowbox) inside Docker
+with automatic updates via Watchtower.
+
+```bash
+$ make setup
+```
+
+### Telegram proxy (two-node chain)
+
+A two-node relay scheme for Telegram designed to bypass deep packet inspection (DPI).
+Direct connections to proxy servers outside the allowed zone are blocked by ISPs,
+so traffic is routed through an intermediate relay server inside the allowed zone.
+
+```mermaid
+flowchart LR
+    Client["Telegram client"]
+    Relay["Relay server<br/>(allowed zone)"]
+    Gateway["Gateway server<br/>(outside perimeter)"]
+    TG["Telegram DCs"]
+
+    Client -- "TCP" --> Relay
+    Relay -- "TLS tunnel<br/>(looks like HTTPS)" --> Gateway
+    Gateway --> TG
+```
+
+#### How it works
+
+```mermaid
+flowchart TB
+    subgraph Relay ["Relay server"]
+        GR["gost-relay<br/>listens on mtproto_port, socks5_port"]
+    end
+
+    subgraph Gateway ["Gateway server"]
+        GB["gost-gateway<br/>TLS relay on gost_tls_port"]
+        MTG["mtg<br/>MTProto proxy<br/>127.0.0.1:mtproto_port"]
+        SOCKS["socks5<br/>SOCKS5 proxy<br/>127.0.0.1:socks5_port"]
+    end
+
+    Client["Telegram client"] -- "MTProto or SOCKS5" --> GR
+    GR -- "relay over TLS" --> GB
+    GB -- "localhost" --> MTG
+    GB -- "localhost" --> SOCKS
+    MTG --> TG["Telegram DCs"]
+    SOCKS --> TG
+```
+
+**Relay server** accepts client connections and wraps them in a TLS tunnel using
+[GOST v3](https://github.com/go-gost/gost). For DPI, this traffic looks like regular HTTPS.
+
+**Gateway server** runs two proxy services, both bound to `127.0.0.1` only (not exposed externally):
+
+| Service | Image | Purpose |
+|---------|-------|---------|
+| [mtg](https://github.com/9seconds/mtg) | `nineseconds/mtg:2` | MTProto proxy for Telegram |
+| [socks5](https://github.com/serjs/socks5-server) | `serjs/go-socks5-proxy` | SOCKS5 proxy with authentication |
+
+GOST's relay protocol multiplexes both MTProto and SOCKS5 streams
+through a **single TLS connection** on one port.
+
+#### Firewall rules
+
+```mermaid
+flowchart LR
+    subgraph Relay ["Relay server (UFW)"]
+        direction TB
+        R22["22/tcp SSH ✓"]
+        RM["mtproto_port/tcp ✓"]
+        RS["socks5_port/tcp ✓"]
+    end
+
+    subgraph Gateway ["Gateway server (UFW)"]
+        direction TB
+        B22["22/tcp SSH ✓"]
+        BT["gost_tls_port/tcp<br/>only from relay IP ✓"]
+        BM["mtproto_port ✗<br/>localhost only"]
+        BS["socks5_port ✗<br/>localhost only"]
+    end
+
+    Internet -- "clients" --> Relay
+    Relay -- "TLS" --> BT
+```
+
+#### Deployment
+
+```bash
+$ make telegram
+```
+
+#### Telegram client configuration
+
+**MTProto** (native, no password required):
+- Server: `<relay_ip>`
+- Port: `<mtproto_port>`
+- Secret: printed during deployment, also stored at `/opt/mtg/secret` on gateway
+
+Or use a link: `tg://proxy?server=<relay_ip>&port=<mtproto_port>&secret=<secret>`
+
+**SOCKS5** (universal):
+- Server: `<relay_ip>`
+- Port: `<socks5_port>`
+- Username / Password: as configured in inventory
+
+## How to
+
+### Outline VPN
 
 ```bash
 $ export VPN_NAME=gateway   # your server name, any way you like
@@ -23,6 +132,29 @@ $ cat ansible/hosts.tpl.ini \
   > ansible/hosts
 
 $ make
+```
+
+### Telegram proxy
+
+Fill in all template placeholders in `ansible/hosts.tpl.ini` and generate the inventory:
+
+```bash
+$ cat ansible/hosts.tpl.ini \
+  | sed "s/{{.Name}}/${VPN_NAME}/g" \
+  | sed "s/{{.Host}}/${VPN_HOST}/g" \
+  | sed "s/{{.RelayName}}/${RELAY_NAME}/g" \
+  | sed "s/{{.RelayHost}}/${RELAY_HOST}/g" \
+  | sed "s/{{.GatewayName}}/${GATEWAY_NAME}/g" \
+  | sed "s/{{.GatewayHost}}/${GATEWAY_HOST}/g" \
+  | sed "s/{{.MTProtoPort}}/${MTPROTO_PORT}/g" \
+  | sed "s/{{.SOCKS5Port}}/${SOCKS5_PORT}/g" \
+  | sed "s/{{.GostTLSPort}}/${GOST_TLS_PORT}/g" \
+  | sed "s/{{.MTGDomain}}/${MTG_DOMAIN}/g" \
+  | sed "s/{{.SOCKS5User}}/${SOCKS5_USER}/g" \
+  | sed "s/{{.SOCKS5Password}}/${SOCKS5_PASSWORD}/g" \
+  > ansible/hosts
+
+$ make telegram
 ```
 
 ### Recommended providers
@@ -38,7 +170,7 @@ $ make
 ## 🧩 Installation
 
 ```bash
-$ git clone git@github.com:octomation/vpn.git && cd vpn
+$ git clone git@github.com:octomation/breakout.git && cd breakout
 ```
 
 ## 👨‍🔬 Research
@@ -76,9 +208,15 @@ At Serverwise
   - [Docker at GitHub](https://github.com/docker).
 - [Outline VPN - Access to the free and open internet](https://www.getoutline.org/).
   - [Outline at GitHub](https://github.com/Jigsaw-Code/?q=outline).
+- [GOST v3 - GO Simple Tunnel](https://github.com/go-gost/gost).
+- [mtg - MTProto proxy for Telegram](https://github.com/9seconds/mtg).
+- [serjs/socks5-server - SOCKS5 proxy](https://github.com/serjs/socks5-server).
 - Docker images
   - [containrrr/watchtower at Docker Hub](https://hub.docker.com/r/containrrr/watchtower).
   - [outline/shadowbox at Quay.io](https://quay.io/repository/outline/shadowbox).
+  - [gogost/gost at Docker Hub](https://hub.docker.com/r/gogost/gost).
+  - [nineseconds/mtg at Docker Hub](https://hub.docker.com/r/nineseconds/mtg).
+  - [serjs/go-socks5-proxy at Docker Hub](https://hub.docker.com/r/serjs/go-socks5-proxy).
 
 #### Upcoming
 
