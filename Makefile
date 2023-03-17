@@ -14,11 +14,10 @@ telegram:
 	$(AT) ansible-playbook ansible/telegram.yml
 .PHONY: telegram
 
-sync: SRC = research/Jigsaw-Code/outline-server/src/server_manager/install_scripts
 sync: DST = ansible/roles/vpn/scripts
+sync: URL = https://raw.githubusercontent.com/OutlineFoundation/outline-server/master/src/server_manager/install_scripts/install_server.sh
 sync:
-	$(AT) git submodule update --init --recursive --remote
-	$(AT) cp $(SRC)/install_server.sh $(DST)/install_outline.sh
+	$(AT) curl -fsSL $(URL) -o $(DST)/install_outline.sh
 .PHONY: sync
 
 todo:
