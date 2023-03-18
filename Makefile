@@ -14,6 +14,10 @@ telegram:
 	$(AT) ansible-playbook ansible/telegram.yml
 .PHONY: telegram
 
+monitoring:
+	$(AT) ansible-playbook ansible/monitoring.yml
+.PHONY: monitoring
+
 sync: DST = ansible/roles/vpn/scripts
 sync: URL = https://raw.githubusercontent.com/OutlineFoundation/outline-server/master/src/server_manager/install_scripts/install_server.sh
 sync:

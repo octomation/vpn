@@ -1,0 +1,6 @@
+---
+
+- name: restart vector
+  shell: docker compose up -d --force-recreate
+  args:
+    chdir: /opt/vector

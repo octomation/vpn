@@ -1,0 +1,7 @@
+---
+
+- name: Deploy monitoring to all servers
+  hosts: docker
+  become: true
+  roles:
+    - vector

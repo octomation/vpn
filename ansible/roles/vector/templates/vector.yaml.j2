@@ -1,0 +1,44 @@
+api:
+  enabled: true
+
+sources:
+  docker_logs:
+    type: docker_logs
+
+  host_metrics:
+    type: host_metrics
+    collectors:
+      - cpu
+      - memory
+      - disk
+      - network
+      - filesystem
+    scrape_interval_secs: 30
+
+sinks:
+  loki:
+    type: loki
+    inputs:
+      - docker_logs
+    endpoint: "{{ vector_loki_endpoint }}"
+    encoding:
+      codec: json
+    auth:
+      strategy: basic
+      user: "{{ vector_loki_user }}"
+      password: "{{ vector_loki_api_key }}"
+    labels:
+      host: "{{ '{{ host }}' }}"
+      container: "{{ '{{ container_name }}' }}"
+
+  prometheus:
+    type: prometheus_remote_write
+    inputs:
+      - host_metrics
+    endpoint: "{{ vector_prometheus_endpoint }}"
+    healthcheck:
+      enabled: false
+    auth:
+      strategy: basic
+      user: "{{ vector_prometheus_user }}"
+      password: "{{ vector_prometheus_api_key }}"

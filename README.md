@@ -118,6 +118,19 @@ Or use a link: `tg://proxy?server=<relay_ip>&port=<mtproto_port>&secret=<secret>
 - Port: `<socks5_port>`
 - Username / Password: as configured in inventory
 
+### Monitoring (all servers)
+
+[Vector](https://vector.dev/) agent deployed as a Docker container on every server.
+Collects Docker container logs and host metrics (CPU, memory, disk, network),
+ships them to [Grafana Cloud](https://grafana.com/products/cloud/) (Loki for logs, Prometheus for metrics).
+
+```bash
+$ make monitoring
+```
+
+Requires Grafana Cloud credentials configured in the inventory
+(see `{{.VectorLoki*}}` and `{{.VectorPrometheus*}}` placeholders in `ansible/hosts.tpl.ini`).
+
 ## How to
 
 ### Outline VPN
@@ -152,6 +165,12 @@ $ cat ansible/hosts.tpl.ini \
   | sed "s/{{.MTGDomain}}/${MTG_DOMAIN}/g" \
   | sed "s/{{.SOCKS5User}}/${SOCKS5_USER}/g" \
   | sed "s/{{.SOCKS5Password}}/${SOCKS5_PASSWORD}/g" \
+  | sed "s/{{.VectorLokiEndpoint}}/${VECTOR_LOKI_ENDPOINT}/g" \
+  | sed "s/{{.VectorLokiUser}}/${VECTOR_LOKI_USER}/g" \
+  | sed "s/{{.VectorLokiApiKey}}/${VECTOR_LOKI_API_KEY}/g" \
+  | sed "s/{{.VectorPrometheusEndpoint}}/${VECTOR_PROMETHEUS_ENDPOINT}/g" \
+  | sed "s/{{.VectorPrometheusUser}}/${VECTOR_PROMETHEUS_USER}/g" \
+  | sed "s/{{.VectorPrometheusApiKey}}/${VECTOR_PROMETHEUS_API_KEY}/g" \
   > ansible/hosts
 
 $ make telegram

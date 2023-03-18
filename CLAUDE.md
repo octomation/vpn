@@ -5,10 +5,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Automated personal VPN and proxy deployment using Infrastructure-as-Code.
-Ansible playbooks deploy two independent setups on Ubuntu cloud instances (DigitalOcean, Linode, Vultr):
+Ansible playbooks deploy three independent setups on Ubuntu cloud instances (DigitalOcean, Linode, Vultr):
 
 1. **Outline VPN** — single-server Shadowbox deployment
 2. **Telegram proxy** — two-node relay chain (relay + gateway) to bypass DPI
+3. **Monitoring** — Vector agent on all servers, shipping logs and host metrics to Grafana Cloud
 
 ## Commands
 
@@ -16,6 +17,7 @@ Ansible playbooks deploy two independent setups on Ubuntu cloud instances (Digit
 |---------|---------|
 | `make` or `make setup` | Deploy Outline VPN via Ansible (`ansible-playbook ansible/vpn.yml`) |
 | `make telegram` | Deploy Telegram proxy chain (`ansible-playbook ansible/telegram.yml`) |
+| `make monitoring` | Deploy Vector monitoring agent (`ansible-playbook ansible/monitoring.yml`) |
 | `make sync` | Fetch the latest Outline install script from [OutlineFoundation/outline-server](https://github.com/OutlineFoundation/outline-server) on GitHub |
 | `make todo` | Find TODO/SkipNow markers |
 
@@ -41,11 +43,17 @@ Roles applied in order:
 5. **gost_gateway** (`ansible/roles/gost_gateway/`) — GOST TLS relay endpoint, accepts connections only from relay IP (gateway only)
 6. **gost_relay** (`ansible/roles/gost_relay/`) — GOST port forwarding over TLS tunnel to gateway (relay only)
 
+### Monitoring (all servers)
+
+Playbook `ansible/monitoring.yml` deploys Vector to all hosts in the `docker` inventory group.
+
+1. **vector role** (`ansible/roles/vector/`) — Deploys [Vector](https://vector.dev/) agent as a Docker container. Collects Docker container logs via `docker_logs` source and host metrics (CPU, memory, disk, network, filesystem) via `host_metrics` source. Ships logs to Grafana Cloud Loki and metrics to Grafana Cloud Prometheus via remote write.
+
 ## Inventory
 
 Generated from `ansible/hosts.tpl.ini` using sed — the generated `ansible/hosts` file is gitignored.
 
-Template placeholders: `{{.VpnName}}`, `{{.VpnHost}}`, `{{.RelayName}}`, `{{.RelayHost}}`, `{{.GatewayName}}`, `{{.GatewayHost}}`, `{{.MTProtoPort}}`, `{{.SOCKS5Port}}`, `{{.GostTLSPort}}`, `{{.MTGDomain}}`, `{{.SOCKS5User}}`, `{{.SOCKS5Password}}`.
+Template placeholders: `{{.VpnName}}`, `{{.VpnHost}}`, `{{.RelayName}}`, `{{.RelayHost}}`, `{{.GatewayName}}`, `{{.GatewayHost}}`, `{{.MTProtoPort}}`, `{{.SOCKS5Port}}`, `{{.GostTLSPort}}`, `{{.MTGDomain}}`, `{{.SOCKS5User}}`, `{{.SOCKS5Password}}`, `{{.VectorLokiEndpoint}}`, `{{.VectorLokiUser}}`, `{{.VectorLokiApiKey}}`, `{{.VectorPrometheusEndpoint}}`, `{{.VectorPrometheusUser}}`, `{{.VectorPrometheusApiKey}}`.
 
 ## Setup Workflow
 

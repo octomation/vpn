@@ -1,0 +1,33 @@
+---
+
+- name: Create vector directory
+  file:
+    path: /opt/vector
+    state: directory
+    mode: "0755"
+
+- name: Deploy vector config
+  template:
+    src: vector.yaml.j2
+    dest: /opt/vector/vector.yaml
+    mode: "0644"
+  notify: restart vector
+
+- name: Deploy docker-compose for vector
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/vector/docker-compose.yml
+    mode: "0644"
+  notify: restart vector
+
+- name: Pull vector image
+  shell: docker pull {{ vector_image }}
+  register: vector_pull
+  changed_when: "'Downloaded newer image' in vector_pull.stdout or 'Pull complete' in vector_pull.stdout"
+
+- name: Start vector
+  shell: docker compose up -d
+  args:
+    chdir: /opt/vector
+  register: vector_up
+  changed_when: "'Started' in vector_up.stderr or 'Creating' in vector_up.stderr"
