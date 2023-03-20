@@ -27,6 +27,18 @@ services:
         - name: gateway-socks5
           addr: "127.0.0.1:{{ socks5_port }}"
 
+  - name: socks5-unsafe-forward
+    addr: ":{{ socks5_unsafe_port }}"
+    handler:
+      type: tcp
+      chain: tls-chain
+    listener:
+      type: tcp
+    forwarder:
+      nodes:
+        - name: gateway-socks5-unsafe
+          addr: "127.0.0.1:{{ socks5_unsafe_port }}"
+
 chains:
   - name: tls-chain
     hops:

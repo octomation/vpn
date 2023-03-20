@@ -18,6 +18,15 @@ monitoring:
 	$(AT) ansible-playbook ansible/monitoring.yml
 .PHONY: monitoring
 
+proxy: SRC = ansible/roles/socks5/files/proxy.pac.tpl
+proxy: DST = ansible/proxy.pac
+proxy:
+	$(AT) sed -e 's/{{.RelayHost}}/$(RELAY_HOST)/g' \
+		-e 's/{{.SOCKS5UnsafePort}}/$(SOCKS5_UNSAFE_PORT)/g' \
+		$(SRC) > $(DST)
+	@echo "Generated $(DST)"
+.PHONY: proxy
+
 sync: DST = ansible/roles/vpn/scripts
 sync: URL = https://raw.githubusercontent.com/OutlineFoundation/outline-server/master/src/server_manager/install_scripts/install_server.sh
 sync:

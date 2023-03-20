@@ -8,3 +8,12 @@ services:
     environment:
       PROXY_USER: "{{ socks5_user }}"
       PROXY_PASSWORD: "{{ socks5_password }}"
+
+  socks5-unsafe:
+    image: {{ socks5_image }}
+    container_name: socks5-unsafe
+    restart: always
+    ports:
+      - "127.0.0.1:{{ socks5_unsafe_port }}:1080"
+    environment:
+      REQUIRE_AUTH: "false"

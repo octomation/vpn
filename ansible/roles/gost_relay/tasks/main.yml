@@ -34,6 +34,14 @@
     proto: tcp
     comment: "SOCKS5 relay"
 
+- name: Allow unsafe SOCKS5 port from VPN only
+  ufw:
+    rule: allow
+    from_ip: "{{ vpn_server_ip }}"
+    port: "{{ socks5_unsafe_port }}"
+    proto: tcp
+    comment: "SOCKS5 unsafe relay (VPN only)"
+
 - name: Pull gost image
   shell: docker pull {{ gost_image }}
   register: gost_pull

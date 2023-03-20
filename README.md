@@ -71,9 +71,14 @@ flowchart TB
 |---------|-------|---------|
 | [mtg](https://github.com/9seconds/mtg) | `nineseconds/mtg:2` | MTProto proxy for Telegram |
 | [socks5](https://github.com/serjs/socks5-server) | `serjs/go-socks5-proxy` | SOCKS5 proxy with authentication |
+| socks5-unsafe | `serjs/go-socks5-proxy` | SOCKS5 proxy without auth (VPN IP-whitelisted) |
 
-GOST's relay protocol multiplexes both MTProto and SOCKS5 streams
+GOST's relay protocol multiplexes MTProto and both SOCKS5 streams
 through a **single TLS connection** on one port.
+
+The `socks5-unsafe` instance has no authentication but is protected by a UFW rule
+on the relay server that only allows connections from the VPN server IP.
+This lets you use it as a private proxy when connected to the VPN — no credentials needed.
 
 #### Firewall rules
 
@@ -84,6 +89,7 @@ flowchart LR
         R22["22/tcp SSH ✓"]
         RM["mtproto_port/tcp ✓"]
         RS["socks5_port/tcp ✓"]
+        RU["socks5_unsafe_port/tcp<br/>only from VPN IP ✓"]
     end
 
     subgraph Gateway ["Gateway server (UFW)"]
@@ -92,6 +98,7 @@ flowchart LR
         BT["gost_tls_port/tcp<br/>only from relay IP ✓"]
         BM["mtproto_port ✗<br/>localhost only"]
         BS["socks5_port ✗<br/>localhost only"]
+        BU["socks5_unsafe_port ✗<br/>localhost only"]
     end
 
     Internet -- "clients" --> Relay
@@ -117,6 +124,30 @@ Or use a link: `tg://proxy?server=<relay_ip>&port=<mtproto_port>&secret=<secret>
 - Server: `<relay_ip>`
 - Port: `<socks5_port>`
 - Username / Password: as configured in inventory
+
+**SOCKS5 without auth** (requires VPN connection):
+- Server: `<relay_ip>`
+- Port: `<socks5_unsafe_port>`
+- No credentials needed — relay firewall only allows traffic from the VPN server IP
+
+#### Proxy auto-configuration (PAC)
+
+For convenient use of the no-auth SOCKS5 proxy, two PAC file templates are provided:
+
+| Template | Purpose |
+|----------|---------|
+| `ansible/roles/socks5/files/proxy.pac.tpl` | macOS system proxy (System Settings → Network → Proxies → Automatic Proxy Configuration) |
+| `ansible/roles/socks5/files/omega.pac.tpl` | [Proxy SwitchyOmega 3](https://github.com/zero-peak/ZeroOmega) browser extension (PAC profile) |
+
+Generate the macOS PAC file:
+
+```bash
+$ export RELAY_HOST=<relay_ip> SOCKS5_UNSAFE_PORT=<port>
+$ make proxy
+```
+
+Both templates route Telegram domains (`*.telegram.org`, `*.t.me`, `*.cdn-telegram.org`)
+through the SOCKS5 proxy and send everything else directly.
 
 ### Monitoring (all servers)
 
@@ -161,6 +192,7 @@ $ cat ansible/hosts.tpl.ini \
   | sed "s/{{.GatewayHost}}/${GATEWAY_HOST}/g" \
   | sed "s/{{.MTProtoPort}}/${MTPROTO_PORT}/g" \
   | sed "s/{{.SOCKS5Port}}/${SOCKS5_PORT}/g" \
+  | sed "s/{{.SOCKS5UnsafePort}}/${SOCKS5_UNSAFE_PORT}/g" \
   | sed "s/{{.GostTLSPort}}/${GOST_TLS_PORT}/g" \
   | sed "s/{{.MTGDomain}}/${MTG_DOMAIN}/g" \
   | sed "s/{{.SOCKS5User}}/${SOCKS5_USER}/g" \

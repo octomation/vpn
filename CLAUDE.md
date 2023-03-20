@@ -19,6 +19,7 @@ Ansible playbooks deploy three independent setups on Ubuntu cloud instances (Dig
 | `make telegram` | Deploy Telegram proxy chain (`ansible-playbook ansible/telegram.yml`) |
 | `make monitoring` | Deploy Vector monitoring agent (`ansible-playbook ansible/monitoring.yml`) |
 | `make sync` | Fetch the latest Outline install script from [OutlineFoundation/outline-server](https://github.com/OutlineFoundation/outline-server) on GitHub |
+| `make proxy` | Generate PAC file for macOS SOCKS proxy from template (`ansible/proxy.pac`); requires `RELAY_HOST` and `SOCKS5_UNSAFE_PORT` env vars |
 | `make todo` | Find TODO/SkipNow markers |
 
 ## Architecture
@@ -39,9 +40,18 @@ Roles applied in order:
 1. **common** (`ansible/roles/common/`) — UFW firewall setup, base packages (applied to both relay and gateway)
 2. **docker** (`ansible/roles/docker/`) — Docker CE and plugins (applied to both relay and gateway)
 3. **mtg** (`ansible/roles/mtg/`) — MTProto proxy for Telegram, bound to `127.0.0.1` (gateway only)
-4. **socks5** (`ansible/roles/socks5/`) — SOCKS5 proxy with authentication, bound to `127.0.0.1` (gateway only)
+4. **socks5** (`ansible/roles/socks5/`) — Two SOCKS5 proxy instances: `socks5` with authentication and `socks5-unsafe` without auth, both bound to `127.0.0.1` (gateway only). The `socks5-unsafe` port on the relay is firewalled to accept connections only from the VPN server IP, making it a private no-auth proxy for VPN users.
 5. **gost_gateway** (`ansible/roles/gost_gateway/`) — GOST TLS relay endpoint, accepts connections only from relay IP (gateway only)
 6. **gost_relay** (`ansible/roles/gost_relay/`) — GOST port forwarding over TLS tunnel to gateway (relay only)
+
+### Proxy auto-configuration (PAC)
+
+PAC file templates for routing Telegram traffic through the no-auth SOCKS5 proxy:
+
+- `ansible/roles/socks5/files/proxy.pac.tpl` — macOS system proxy configuration
+- `ansible/roles/socks5/files/omega.pac.tpl` — [Proxy SwitchyOmega 3](https://github.com/nicehorse06/SwitchyOmega) browser extension
+
+`make proxy` generates `ansible/proxy.pac` from `proxy.pac.tpl` by substituting `{{.RelayHost}}` and `{{.SOCKS5UnsafePort}}`. The `omega.pac.tpl` is provided as a reference for manual import into the browser extension.
 
 ### Monitoring (all servers)
 
@@ -53,7 +63,7 @@ Playbook `ansible/monitoring.yml` deploys Vector to all hosts in the `docker` in
 
 Generated from `ansible/hosts.tpl.ini` using sed — the generated `ansible/hosts` file is gitignored.
 
-Template placeholders: `{{.VpnName}}`, `{{.VpnHost}}`, `{{.RelayName}}`, `{{.RelayHost}}`, `{{.GatewayName}}`, `{{.GatewayHost}}`, `{{.MTProtoPort}}`, `{{.SOCKS5Port}}`, `{{.GostTLSPort}}`, `{{.MTGDomain}}`, `{{.SOCKS5User}}`, `{{.SOCKS5Password}}`, `{{.VectorLokiEndpoint}}`, `{{.VectorLokiUser}}`, `{{.VectorLokiApiKey}}`, `{{.VectorPrometheusEndpoint}}`, `{{.VectorPrometheusUser}}`, `{{.VectorPrometheusApiKey}}`.
+Template placeholders: `{{.VpnName}}`, `{{.VpnHost}}`, `{{.RelayName}}`, `{{.RelayHost}}`, `{{.GatewayName}}`, `{{.GatewayHost}}`, `{{.MTProtoPort}}`, `{{.SOCKS5Port}}`, `{{.SOCKS5UnsafePort}}`, `{{.GostTLSPort}}`, `{{.MTGDomain}}`, `{{.SOCKS5User}}`, `{{.SOCKS5Password}}`, `{{.VectorLokiEndpoint}}`, `{{.VectorLokiUser}}`, `{{.VectorLokiApiKey}}`, `{{.VectorPrometheusEndpoint}}`, `{{.VectorPrometheusUser}}`, `{{.VectorPrometheusApiKey}}`.
 
 ## Setup Workflow
 
