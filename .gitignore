@@ -1,3 +1,7 @@
+# ln -s /sparkle/project .github/notes
+/.github/notes
+
+# sensitive data
 /ansible/hosts
 /ansible/proxy.pac
 .env
